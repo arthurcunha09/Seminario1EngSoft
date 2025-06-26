@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apresentação: Reúso de Software</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblioteca para gerar QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -37,10 +39,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
         /* Estilo para o container da apresentação */
         .presentation-container {
             max-width: 80vw;
@@ -49,412 +47,471 @@
             height: 100%;
             aspect-ratio: 16 / 9;
         }
+        /* Estilos para o modo controlador e setup */
+        #controller-view, #setup-overlay {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Container da Apresentação com a nova classe de dimensionamento -->
-    <div class="presentation-container bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
-        
-        <!-- Área do Slide -->
-        <main id="slide-container" class="flex-grow p-8 md:p-12 lg:p-16 flex items-center justify-center">
+    <!-- Container Principal que alterna entre apresentação e controlador -->
+    <div id="app-container" class="w-full h-full">
 
-            <!-- Slide 1: Título -->
-            <div id="slide-1" class="slide">
-                <div class="bg-blue-600 text-white py-2 px-4 rounded-full text-lg font-bold mb-6">Engenharia de Software I</div>
-                <h1 class="text-6xl md:text-7xl font-bold text-gray-800">Reúso de Software</h1>
-                <p class="text-3xl md:text-4xl text-gray-600 mt-4">Estratégias e Impacto</p>
-                <div class="mt-16 text-2xl text-gray-500">
-                    <p>Autores: Arthur, João, Matheus, Pedro, Ryan</p>
-                </div>
-            </div>
+        <!-- Overlay de Configuração do Controlo Remoto -->
+        <div id="setup-overlay" class="absolute inset-0 bg-gray-800 bg-opacity-95 text-white flex flex-col justify-center items-center z-50 p-4">
+             <h2 class="text-4xl font-bold mb-4">Controlo Remoto</h2>
+             <p class="text-xl mb-4">Leia o QR Code com o seu telemóvel para o usar como controlo remoto.</p>
+             <div id="qr-code-img" class="bg-white p-4 rounded-lg inline-block"></div>
+             <p class="text-lg mt-4">ID da Sessão: <span id="session-id-qr" class="font-mono bg-gray-700 px-2 py-1 rounded"></span></p>
+             <button id="start-presentation-btn" class="mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-xl">Iniciar Apresentação</button>
+        </div>
 
-            <!-- Slide 2: Roteiro (Corrigido) -->
-            <div id="slide-2" class="slide items-start text-left">
-                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full">Roteiro da Apresentação</h2>
-                <ul class="w-full space-y-5 text-3xl">
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">1</span>
-                        <p>Introdução</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">2</span>
-                        <p>Componetização (Ryan)</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">3</span>
-                        <p>Frameworks (Pedro)</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">4</span>
-                        <p>Linhas de Produção (Arthur)</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">5</span>
-                        <p>Produtos COTS (Matheus)</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">6</span>
-                        <p>Geradores de Código (João)</p>
-                    </li>
-                    <li class="flex items-center gap-4">
-                        <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">7</span>
-                        <p>Conclusão</p>
-                    </li>
-                </ul>
-            </div>
-            
-            <!-- Slide 3: O que é Reúso? -->
-            <div id="slide-3" class="slide">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-6">O que é Reúso de Software?</h2>
-                 <p class="text-4xl text-gray-700 leading-tight">É o processo de criar software a partir de partes já existentes, em vez de começar do zero.</p>
-                 <p class="mt-8 text-4xl font-bold text-blue-600 p-6 bg-blue-50 rounded-lg">"Não reinventar a roda."</p>
-            </div>
+        <!-- Visualização da Apresentação -->
+        <div id="presenter-view" class="w-full h-full flex justify-center items-center" style="display: none;">
+            <div class="presentation-container bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
+                <main id="slide-container" class="flex-grow p-8 md:p-12 lg:p-16 flex items-center justify-center">
+                    
+                    <!-- Slide 1: Título -->
+                    <div id="slide-1" class="slide">
+                        <div class="bg-blue-600 text-white py-2 px-4 rounded-full text-lg font-bold mb-6">Engenharia de Software I</div>
+                        <h1 class="text-6xl md:text-7xl font-bold text-gray-800">Reúso de Software</h1>
+                        <p class="text-3xl md:text-4xl text-gray-600 mt-4">Estratégias e Impacto</p>
+                        <div class="mt-16 text-2xl text-gray-500">
+                            <p>Autores: Arthur, João, Matheus, Pedro, Ryan</p>
+                        </div>
+                    </div>
+                    <!-- Slide 2: Roteiro (Corrigido) -->
+                    <div id="slide-2" class="slide items-start text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full">Roteiro da Apresentação</h2>
+                        <ul class="w-full space-y-5 text-3xl">
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">1</span>
+                                <p>Introdução</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">2</span>
+                                <p>Componetização (Ryan)</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">3</span>
+                                <p>Frameworks (Pedro)</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">4</span>
+                                <p>Linhas de Produção (Arthur)</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">5</span>
+                                <p>Produtos COTS (Matheus)</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">6</span>
+                                <p>Geradores de Código (João)</p>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">7</span>
+                                <p>Conclusão</p>
+                            </li>
+                        </ul>
+                    </div>
+                     <div id="slide-3" class="slide">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-6">O que é Reúso de Software?</h2>
+                         <p class="text-4xl text-gray-700 leading-tight">É o processo de criar software a partir de partes já existentes, em vez de começar do zero.</p>
+                         <p class="mt-8 text-4xl font-bold text-blue-600 p-6 bg-blue-50 rounded-lg">"Não reinventar a roda."</p>
+                    </div>
 
-            <!-- SLIDES DO RYAN - INÍCIO (EXEMPLO) -->
-            
-            <!-- Slide 4: Componentização (Ryan) - Modelo com Analogia Visual -->
-            <div id="slide-4" class="slide">
-                <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
-                    <div class="w-full md:w-1/2 text-left">
-                        <h2 class="text-5xl font-bold text-gray-800 mb-6">Componentização</h2>
-                        <p class="text-3xl text-gray-500 mb-8">(Responsável: Ryan)</p>
+                    <!-- SLIDES DO RYAN - INÍCIO (EXEMPLO) -->
+                    <div id="slide-4" class="slide">
+                        <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-full md:w-1/2 text-left">
+                                <h2 class="text-5xl font-bold text-gray-800 mb-6">Componentização</h2>
+                                <p class="text-3xl text-gray-500 mb-8">(Responsável: Ryan)</p>
+                                <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
+                                <p class="text-3xl text-gray-400 leading-tight">[Use este espaço para introduzir o conceito. Uma analogia visual, como a de LEGO, pode ajudar a explicar a ideia de partes autônomas.]</p>
+                            </div>
+                            <div class="w-full md:w-1/2 flex justify-center items-center">
+                                <svg class="w-48 h-48" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g><rect x="20" y="80" width="80" height="40" rx="5" fill="#f56565"/><circle cx="40" cy="72" r="8" fill="#f56565"/><circle cx="80" cy="72" r="8" fill="#f56565"/><rect x="100" y="120" width="80" height="40" rx="5" fill="#4299e1"/><circle cx="120" cy="112" r="8" fill="#4299e1"/><circle cx="160" cy="112" r="8" fill="#4299e1"/><rect x="60" y="120" width="40" height="40" rx="5" fill="#48bb78"/><circle cx="80" cy="112" r="8" fill="#48bb78"/></g></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="slide-5" class="slide items-start text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Ciclo de Vida de um Componente</h2>
+                         <div class="w-full flex justify-around text-2xl text-center">
+                            <div class="w-1/4">
+                                <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
+                                <h3 class="font-bold mb-2">1. Qualificar</h3>
+                                <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
+                            </div>
+                             <div class="w-1/4">
+                                <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m12.728 12.728L15.95 15.95m-1.414-1.414l-1.414-1.414"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                                <h3 class="font-bold mb-2">2. Generalizar</h3>
+                                <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
+                            </div>
+                             <div class="w-1/4">
+                                <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M3 10v6a2 2 0 002 2h6M3 10V4a2 2 0 012-2h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V10M3 10h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V20"></path></svg></div>
+                                <h3 class="font-bold mb-2">3. Compor</h3>
+                                <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- SLIDES DO RYAN - FIM (EXEMPLO) -->
+
+                    <!-- SLIDES DO PEDRO - INÍCIO (EXEMPLO) -->
+                    <div id="slide-6" class="slide">
+                        <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-full md:w-1/2 flex justify-center items-center">
+                                <svg class="w-48 h-48 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="w-full md:w-1/2 text-left">
+                                <h2 class="text-5xl font-bold text-gray-800 mb-6">Frameworks</h2>
+                                <p class="text-3xl text-gray-500 mb-8">(Responsável: Pedro)</p>
+                                <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
+                                <p class="text-3xl text-gray-400 leading-tight">[Introduza o tema aqui. A analogia da planta da casa é uma boa sugestão para explicar o conceito.]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="slide-7" class="slide items-start text-left">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Quem está no Controle?</h2>
+                         <div class="w-full flex justify-around text-2xl text-center">
+                            <div class="w-2/5">
+                                <h3 class="font-bold text-gray-700 text-3xl mb-4">Desenvolvimento Tradicional</h3>
+                                <div class="p-4 border-2 border-gray-300 rounded-lg">
+                                    <div class="bg-indigo-500 text-white p-3 rounded mb-4">SEU CÓDIGO</div>
+                                    <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    <div class="bg-gray-300 text-gray-700 p-3 rounded mt-4">BIBLIOTECA</div>
+                                </div>
+                                <p class="mt-4 font-bold text-gray-400">[Explique este fluxo aqui.]</p>
+                            </div>
+                            <div class="w-2/5">
+                                <h3 class="font-bold text-blue-700 text-3xl mb-4">Usando um Framework</h3>
+                                 <div class="p-4 border-2 border-blue-500 rounded-lg">
+                                    <div class="bg-blue-500 text-white p-3 rounded mb-4">FRAMEWORK</div>
+                                    <svg class="w-8 h-8 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    <div class="bg-indigo-300 text-gray-700 p-3 rounded mt-4">SEU CÓDIGO</div>
+                                </div>
+                                <p class="mt-4 font-bold text-gray-400">[Explique a inversão de controle aqui.]</p>
+                            </div>
+                         </div>
+                    </div>
+                    <!-- SLIDES DO PEDRO - FIM (EXEMPLO) -->
+
+                    <!-- SLIDES DO ARTHUR - INÍCIO -->
+                    <div id="slide-8" class="slide">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-6">Uma Abordagem Industrial</h2>
+                         <p class="text-3xl text-gray-500 mb-8">(Responsável: Arthur)</p>
+                         <p class="text-4xl text-gray-700 leading-tight">Vamos falar sobre as <strong class="text-blue-600">Linhas de Produção de Software</strong>.</p>
+                         <p class="text-3xl text-gray-500 mt-4">Do inglês: <em>Software Product Lines</em> (SPL).</p>
+                    </div>
+                    <div id="slide-9" class="slide">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-6">A Analogia: Indústria Automobilística</h2>
+                         <p class="text-4xl text-gray-700 leading-tight">Como a Volkswagen consegue produzir carros tão diferentes como Golf, T-Cross e Audi A3 de forma tão eficiente?</p>
+                    </div>
+                    <div id="slide-10" class="slide">
+                        <div class="w-full h-full flex flex-col justify-center items-center">
+                            <h2 class="text-5xl font-bold text-gray-800 mb-8">A Resposta: A Plataforma</h2>
+                            <div class="w-1/2 bg-gray-200 rounded-lg p-4 border-2 border-dashed border-gray-400 text-center">
+                                <p class="text-2xl font-bold text-gray-600">Plataforma MQB (Núcleo Comum)</p>
+                                <p class="text-xl text-gray-500">(Chassi, Motor, Elétrica)</p>
+                            </div>
+                            <div class="flex w-full justify-around mt-4">
+                                <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            </div>
+                            <div class="flex w-full justify-around mt-4">
+                                <div class="w-1/3 bg-red-500 rounded-lg p-4 shadow-lg text-white">
+                                    <p class="text-3xl font-bold">Hatch</p>
+                                    <p class="text-lg">Variação 1</p>
+                                </div>
+                                <div class="w-1/3 bg-gray-700 rounded-lg p-4 shadow-lg text-white">
+                                    <p class="text-3xl font-bold">SUV</p>
+                                    <p class="text-lg">Variação 2</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="slide-11" class="slide">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6">A "Fábrica" de Software</h2>
+                        <p class="text-4xl text-gray-700 leading-tight">Uma SPL cria uma <strong class="text-blue-600">plataforma base</strong> (ativos de núcleo) e a partir dela, gera uma <strong class="text-blue-600">família de produtos</strong> com variações específicas.</p>
+                    </div>
+                    <div id="slide-12" class="slide items-start text-left">
+                         <h2 class="text-5xl font-bold text-green-600 mb-10">Por que usar uma SPL?</h2>
+                         <ul class="space-y-6 text-4xl list-decimal list-inside">
+                            <li><strong>Velocidade:</strong> Lançar novos produtos se torna muito mais rápido.</li>
+                            <li><strong>Confiabilidade:</strong> O núcleo é amplamente testado e validado.</li>
+                            <li><strong>Padronização:</strong> Garante consistência e facilita o trabalho da equipe.</li>
+                         </ul>
+                    </div>
+                    <div id="slide-13" class="slide items-start text-left">
+                         <h2 class="text-5xl font-bold text-red-600 mb-10">O Preço a Pagar</h2>
+                         <ul class="space-y-6 text-4xl list-decimal list-inside">
+                            <li><strong>Planejamento:</strong> Exige um altíssimo investimento e planejamento inicial.</li>
+                            <li><strong>Risco Centralizado:</strong> Um erro no núcleo afeta TODOS os produtos.</li>
+                            <li><strong>Evolução Lenta:</strong> Mudar a plataforma base é um processo complexo.</li>
+                         </ul>
+                    </div>
+                    <div id="slide-14" class="slide">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6">SPL no Mundo Real</h2>
+                        <p class="text-3xl text-gray-600 mb-6">Os sites de imobiliária são um ótimo exemplo prático.</p>
+                        <div class="w-full h-2/3 grid grid-cols-3 gap-4">
+                            <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/senna.png" alt="Screenshot do site Senna Imóveis" class="w-full h-full object-cover"></div>
+                            <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/martins.png" alt="Screenshot do site Martins Imóveis" class="w-full h-full object-cover"></div>
+                            <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/delci.png" alt="Screenshot do site Delci Couto Imobiliária" class="w-full h-full object-cover"></div>
+                        </div>
+                    </div>
+                    <!-- SLIDES DO ARTHUR - FIM -->
+                    
+                    <!-- SLIDES DO MATHEUS - INÍCIO (EXEMPLO) -->
+                    <div id="slide-15" class="slide">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6">Produtos COTS</h2>
+                        <p class="text-3xl text-gray-500 mb-8">(Responsável: Matheus)</p>
                         <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
-                        <p class="text-3xl text-gray-400 leading-tight">[Use este espaço para introduzir o conceito. Uma analogia visual, como a de LEGO, pode ajudar a explicar a ideia de partes autônomas.]</p>
+                        <p class="text-4xl text-gray-400 leading-tight">[Use este espaço para introduzir o que são produtos COTS, talvez usando uma analogia para explicar o conceito.]</p>
                     </div>
-                    <div class="w-full md:w-1/2 flex justify-center items-center">
-                        <svg class="w-48 h-48" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g><rect x="20" y="80" width="80" height="40" rx="5" fill="#f56565"/><circle cx="40" cy="72" r="8" fill="#f56565"/><circle cx="80" cy="72" r="8" fill="#f56565"/><rect x="100" y="120" width="80" height="40" rx="5" fill="#4299e1"/><circle cx="120" cy="112" r="8" fill="#4299e1"/><circle cx="160" cy="112" r="8" fill="#4299e1"/><rect x="60" y="120" width="40" height="40" rx="5" fill="#48bb78"/><circle cx="80" cy="112" r="8" fill="#48bb78"/></g></svg>
+                    <div id="slide-16" class="slide items-start text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Dilema: Construir vs. Comprar</h2>
+                         <div class="w-full flex justify-around text-2xl text-center">
+                            <div class="w-2/5 p-4 border-2 border-gray-300 rounded-lg">
+                                <svg class="w-16 h-16 mx-auto text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                <h3 class="font-bold text-3xl mb-4">Construir</h3>
+                                <p class="text-gray-400 font-semibold mt-2">[Aponte aqui os prós e contras de desenvolver uma solução do zero.]</p>
+                            </div>
+                             <div class="w-2/5 p-4 border-2 border-blue-500 rounded-lg">
+                                <svg class="w-16 h-16 mx-auto text-blue-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                <h3 class="font-bold text-3xl mb-4">Comprar (COTS)</h3>
+                                <p class="text-gray-400 font-semibold mt-2">[Aponte aqui os prós e contras de adquirir uma solução pronta.]</p>
+                            </div>
+                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Slide 5: Componentização "Ciclo de Vida" (Ryan) -->
-            <div id="slide-5" class="slide items-start text-left">
-                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Ciclo de Vida de um Componente</h2>
-                 <div class="w-full flex justify-around text-2xl text-center">
-                    <div class="w-1/4">
-                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
-                        <h3 class="font-bold mb-2">1. Qualificar</h3>
-                        <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
-                    </div>
-                     <div class="w-1/4">
-                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m12.728 12.728L15.95 15.95m-1.414-1.414l-1.414-1.414"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
-                        <h3 class="font-bold mb-2">2. Generalizar</h3>
-                        <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
-                    </div>
-                     <div class="w-1/4">
-                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M3 10v6a2 2 0 002 2h6M3 10V4a2 2 0 012-2h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V10M3 10h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V20"></path></svg></div>
-                        <h3 class="font-bold mb-2">3. Compor</h3>
-                        <p class="text-gray-400">[Descreva esta etapa do ciclo.]</p>
-                    </div>
-                </div>
-            </div>
+                    <!-- SLIDES DO MATHEUS - FIM (EXEMPLO) -->
 
-            <!-- SLIDES DO RYAN - FIM (EXEMPLO) -->
-
-            <!-- SLIDES DO PEDRO - INÍCIO (EXEMPLO) -->
-
-            <!-- Slide 6: Frameworks (Pedro) - Analogia -->
-             <div id="slide-6" class="slide">
-                <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
-                    <div class="w-full md:w-1/2 flex justify-center items-center">
-                        <svg class="w-48 h-48 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
+                    <!-- SLIDES DO JOÃO - INÍCIO (EXEMPLO) -->
+                    <div id="slide-17" class="slide">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-6">Geradores de Programas</h2>
+                        <p class="text-3xl text-gray-500 mb-8">(Responsável: João)</p>
+                         <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
+                        <p class="text-4xl text-gray-400 leading-tight">[Use este espaço para explicar o conceito de Geradores. Uma analogia, como a da "máquina de café", pode ser útil.]</p>
                     </div>
-                    <div class="w-full md:w-1/2 text-left">
-                        <h2 class="text-5xl font-bold text-gray-800 mb-6">Frameworks</h2>
-                        <p class="text-3xl text-gray-500 mb-8">(Responsável: Pedro)</p>
-                        <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
-                        <p class="text-3xl text-gray-400 leading-tight">[Introduza o tema aqui. A analogia da planta da casa é uma boa sugestão para explicar o conceito.]</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Slide 7: Frameworks "Inversão de Controle" (Pedro) -->
-            <div id="slide-7" class="slide items-start text-left">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Quem está no Controle?</h2>
-                 <div class="w-full flex justify-around text-2xl text-center">
-                    <div class="w-2/5">
-                        <h3 class="font-bold text-gray-700 text-3xl mb-4">Desenvolvimento Tradicional</h3>
-                        <div class="p-4 border-2 border-gray-300 rounded-lg">
-                            <div class="bg-indigo-500 text-white p-3 rounded mb-4">SEU CÓDIGO</div>
-                            <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                            <div class="bg-gray-300 text-gray-700 p-3 rounded mt-4">BIBLIOTECA</div>
+                    <div id="slide-18" class="slide items-start text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Subindo na Escada da Abstração</h2>
+                         <div class="w-full flex justify-center items-center text-2xl text-center">
+                            <div class="w-3/4 space-y-2">
+                                <div class="p-4 bg-blue-500 text-white rounded-lg shadow-lg">
+                                    <h3 class="text-3xl font-bold">GERADOR</h3>
+                                    <p class="text-gray-200">[Explique o papel do gerador]</p>
+                                </div>
+                                <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                 <div class="p-4 bg-indigo-400 text-white rounded-lg shadow-lg">
+                                    <h3 class="text-3xl font-bold">MODELO (UML, DSL)</h3>
+                                    <p class="text-gray-200">[Explique o que é o modelo neste contexto]</p>
+                                </div>
+                                 <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                  <div class="p-4 bg-gray-300 text-gray-700 rounded-lg shadow-lg">
+                                    <h3 class="text-3xl font-bold">CÓDIGO (JAVA, PYTHON)</h3>
+                                    <p class="text-gray-600">[Explique o que é gerado]</p>
+                                </div>
+                            </div>
                         </div>
-                        <p class="mt-4 font-bold text-gray-400">[Explique este fluxo aqui.]</p>
+                         <p class="text-2xl mt-4 w-full text-center text-gray-500">[Frase de impacto para resumir a ideia de abstração.]</p>
                     </div>
-                    <div class="w-2/5">
-                        <h3 class="font-bold text-blue-700 text-3xl mb-4">Usando um Framework</h3>
-                         <div class="p-4 border-2 border-blue-500 rounded-lg">
-                            <div class="bg-blue-500 text-white p-3 rounded mb-4">FRAMEWORK</div>
-                            <svg class="w-8 h-8 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                            <div class="bg-indigo-300 text-gray-700 p-3 rounded mt-4">SEU CÓDIGO</div>
-                        </div>
-                        <p class="mt-4 font-bold text-gray-400">[Explique a inversão de controle aqui.]</p>
-                    </div>
-                 </div>
-            </div>
-            
-            <!-- SLIDES DO PEDRO - FIM (EXEMPLO) -->
-
-            <!-- SLIDES DO ARTHUR - INÍCIO -->
-            
-            <div id="slide-8" class="slide">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-6">Uma Abordagem Industrial</h2>
-                 <p class="text-3xl text-gray-500 mb-8">(Responsável: Arthur)</p>
-                 <p class="text-4xl text-gray-700 leading-tight">Vamos falar sobre as <strong class="text-blue-600">Linhas de Produção de Software</strong>.</p>
-                 <p class="text-3xl text-gray-500 mt-4">Do inglês: <em>Software Product Lines</em> (SPL).</p>
-            </div>
-            <div id="slide-9" class="slide">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-6">A Analogia: Indústria Automobilística</h2>
-                 <p class="text-4xl text-gray-700 leading-tight">Como a Volkswagen consegue produzir carros tão diferentes como Golf, T-Cross e Audi A3 de forma tão eficiente?</p>
-            </div>
-            <div id="slide-10" class="slide">
-                <div class="w-full h-full flex flex-col justify-center items-center">
-                    <h2 class="text-5xl font-bold text-gray-800 mb-8">A Resposta: A Plataforma</h2>
-                    <div class="w-1/2 bg-gray-200 rounded-lg p-4 border-2 border-dashed border-gray-400 text-center">
-                        <p class="text-2xl font-bold text-gray-600">Plataforma MQB (Núcleo Comum)</p>
-                        <p class="text-xl text-gray-500">(Chassi, Motor, Elétrica)</p>
-                    </div>
-                    <div class="flex w-full justify-around mt-4">
-                        <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                        <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                    </div>
-                    <div class="flex w-full justify-around mt-4">
-                        <div class="w-1/3 bg-red-500 rounded-lg p-4 shadow-lg text-white">
-                            <p class="text-3xl font-bold">Hatch</p>
-                            <p class="text-lg">Variação 1</p>
-                        </div>
-                        <div class="w-1/3 bg-gray-700 rounded-lg p-4 shadow-lg text-white">
-                            <p class="text-3xl font-bold">SUV</p>
-                            <p class="text-lg">Variação 2</p>
+                    <!-- SLIDES DO JOÃO - FIM (EXEMPLO) -->
+                    
+                    <!-- Slide 19: Tabela Comparativa -->
+                    <div id="slide-19" class="slide items-start w-full">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6 w-full text-center">Tabela Comparativa</h2>
+                        <div class="w-full overflow-x-auto text-2xl">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-blue-600 text-white">
+                                        <th class="p-4 border">Abordagem</th>
+                                        <th class="p-4 border text-center">Velocidade</th>
+                                        <th class="p-4 border text-center">Flexibilidade</th>
+                                        <th class="p-4 border text-center">Custo Inicial</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-700">
+                                    <tr class="bg-gray-50"><td class="p-4 border font-bold">Componentes</td><td class="p-4 border text-center">Médio</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Médio</td></tr>
+                                    <tr><td class="p-4 border font-bold">Frameworks</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Média</td><td class="p-4 border text-center">Baixo</td></tr>
+                                    <tr class="bg-gray-50"><td class="p-4 border font-bold">SPL</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Alto</td></tr>
+                                    <tr><td class="p-4 border font-bold">COTS</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Muito Baixa</td><td class="p-4 border text-center">Variável</td></tr>
+                                    <tr class="bg-gray-50"><td class="p-4 border font-bold">Geradores</td><td class="p-4 border text-center">Altíssima</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Baixo</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div id="slide-11" class="slide">
-                <h2 class="text-5xl font-bold text-gray-800 mb-6">A "Fábrica" de Software</h2>
-                <p class="text-4xl text-gray-700 leading-tight">Uma SPL cria uma <strong class="text-blue-600">plataforma base</strong> (ativos de núcleo) e a partir dela, gera uma <strong class="text-blue-600">família de produtos</strong> com variações específicas.</p>
-            </div>
-            <div id="slide-12" class="slide items-start text-left">
-                 <h2 class="text-5xl font-bold text-green-600 mb-10">Por que usar uma SPL?</h2>
-                 <ul class="space-y-6 text-4xl list-decimal list-inside">
-                    <li><strong>Velocidade:</strong> Lançar novos produtos se torna muito mais rápido.</li>
-                    <li><strong>Confiabilidade:</strong> O núcleo é amplamente testado e validado.</li>
-                    <li><strong>Padronização:</strong> Garante consistência e facilita o trabalho da equipe.</li>
-                 </ul>
-            </div>
-            <div id="slide-13" class="slide items-start text-left">
-                 <h2 class="text-5xl font-bold text-red-600 mb-10">O Preço a Pagar</h2>
-                 <ul class="space-y-6 text-4xl list-decimal list-inside">
-                    <li><strong>Planejamento:</strong> Exige um altíssimo investimento e planejamento inicial.</li>
-                    <li><strong>Risco Centralizado:</strong> Um erro no núcleo afeta TODOS os produtos.</li>
-                    <li><strong>Evolução Lenta:</strong> Mudar a plataforma base é um processo complexo.</li>
-                 </ul>
-            </div>
-            <div id="slide-14" class="slide">
-                <h2 class="text-5xl font-bold text-gray-800 mb-6">SPL no Mundo Real</h2>
-                <p class="text-3xl text-gray-600 mb-6">Os sites de imobiliária são um ótimo exemplo prático.</p>
-                <div class="w-full h-2/3 grid grid-cols-3 gap-4">
-                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/senna.png" alt="Screenshot do site Senna Imóveis" class="w-full h-full object-cover"></div>
-                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/martins.png" alt="Screenshot do site Martins Imóveis" class="w-full h-full object-cover"></div>
-                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/delci.png" alt="Screenshot do site Delci Couto Imobiliária" class="w-full h-full object-cover"></div>
-                </div>
-            </div>
-            
-            <!-- SLIDES DO ARTHUR - FIM -->
-            
-            <!-- SLIDES DO MATHEUS - INÍCIO (EXEMPLO) -->
-
-            <div id="slide-15" class="slide">
-                <h2 class="text-5xl font-bold text-gray-800 mb-6">Produtos COTS</h2>
-                <p class="text-3xl text-gray-500 mb-8">(Responsável: Matheus)</p>
-                <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
-                <p class="text-4xl text-gray-400 leading-tight">[Use este espaço para introduzir o que são produtos COTS, talvez usando uma analogia para explicar o conceito.]</p>
-            </div>
-            <div id="slide-16" class="slide items-start text-left">
-                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Dilema: Construir vs. Comprar</h2>
-                 <div class="w-full flex justify-around text-2xl text-center">
-                    <div class="w-2/5 p-4 border-2 border-gray-300 rounded-lg">
-                        <svg class="w-16 h-16 mx-auto text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        <h3 class="font-bold text-3xl mb-4">Construir</h3>
-                        <p class="text-gray-400 font-semibold mt-2">[Aponte aqui os prós e contras de desenvolver uma solução do zero.]</p>
+                    
+                    <!-- Slide 20: Conclusões -->
+                    <div id="slide-20" class="slide">
+                         <h2 class="text-5xl font-bold text-gray-800 mb-8">Conclusões</h2>
+                         <div class="space-y-8 text-4xl">
+                            <p class="p-4 bg-blue-50 rounded-lg">O reúso é uma estratégia <strong class="text-blue-600">fundamental</strong>, não um luxo.</p>
+                            <p class="p-4 bg-blue-50 rounded-lg">Exige uma <strong class="text-blue-600">mudança cultural</strong>: pensar em "construir para reutilizar".</p>
+                         </div>
                     </div>
-                     <div class="w-2/5 p-4 border-2 border-blue-500 rounded-lg">
-                        <svg class="w-16 h-16 mx-auto text-blue-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
-                        <h3 class="font-bold text-3xl mb-4">Comprar (COTS)</h3>
-                        <p class="text-gray-400 font-semibold mt-2">[Aponte aqui os prós e contras de adquirir uma solução pronta.]</p>
+                    
+                    <!-- Slide 21: Perguntas? -->
+                    <div id="slide-21" class="slide">
+                        <h2 class="text-7xl font-bold text-gray-800">Perguntas?</h2>
                     </div>
-                 </div>
-            </div>
-            
-            <!-- SLIDES DO MATHEUS - FIM (EXEMPLO) -->
-
-            <!-- SLIDES DO JOÃO - INÍCIO (EXEMPLO) -->
-
-            <div id="slide-17" class="slide">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-6">Geradores de Programas</h2>
-                <p class="text-3xl text-gray-500 mb-8">(Responsável: João)</p>
-                 <p class="text-2xl text-red-500 bg-red-100 p-2 rounded-lg mb-4">OBS: A estrutura a seguir é um exemplo. Sinta-se à vontade para alterá-la!</p>
-                <p class="text-4xl text-gray-400 leading-tight">[Use este espaço para explicar o conceito de Geradores. Uma analogia, como a da "máquina de café", pode ser útil.]</p>
-            </div>
-            <div id="slide-18" class="slide items-start text-left">
-                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Subindo na Escada da Abstração</h2>
-                 <div class="w-full flex justify-center items-center text-2xl text-center">
-                    <div class="w-3/4 space-y-2">
-                        <div class="p-4 bg-blue-500 text-white rounded-lg shadow-lg">
-                            <h3 class="text-3xl font-bold">GERADOR</h3>
-                            <p class="text-gray-200">[Explique o papel do gerador]</p>
-                        </div>
-                        <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                         <div class="p-4 bg-indigo-400 text-white rounded-lg shadow-lg">
-                            <h3 class="text-3xl font-bold">MODELO (UML, DSL)</h3>
-                            <p class="text-gray-200">[Explique o que é o modelo neste contexto]</p>
-                        </div>
-                         <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                          <div class="p-4 bg-gray-300 text-gray-700 rounded-lg shadow-lg">
-                            <h3 class="text-3xl font-bold">CÓDIGO (JAVA, PYTHON)</h3>
-                            <p class="text-gray-600">[Explique o que é gerado]</p>
-                        </div>
+                    
+                    <!-- Slide 22: Referências -->
+                    <div id="slide-22" class="slide items-start text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-8">Bibliografia</h2>
+                        <ul class="space-y-4 text-xl list-disc list-inside text-gray-600">
+                            <li>Czarnecki, K.; Eisenecker, U. W. <strong>Generative Programming: Methods, Tools, and Applications</strong>. Addison-Wesley, 2000.</li>
+                            <li>Pressman, Roger S. <strong>Engenharia de Software</strong>. 6ª ed., Bookman, 2006.</li>
+                            <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 9. ed. São Paulo: Pearson Addison Wesley, 2011.</li>
+                            <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 10. ed. São Paulo: Pearson, 2019.</li>
+                        </ul>
                     </div>
-                </div>
-                 <p class="text-2xl mt-4 w-full text-center text-gray-500">[Frase de impacto para resumir a ideia de abstração.]</p>
+                </main>
             </div>
+        </div>
 
-            <!-- SLIDES DO JOÃO - FIM (EXEMPLO) -->
-            
-            <!-- Slide 19: Tabela Comparativa -->
-            <div id="slide-19" class="slide items-start w-full">
-                <h2 class="text-5xl font-bold text-gray-800 mb-6 w-full text-center">Tabela Comparativa</h2>
-                <div class="w-full overflow-x-auto text-2xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-blue-600 text-white">
-                                <th class="p-4 border">Abordagem</th>
-                                <th class="p-4 border text-center">Velocidade</th>
-                                <th class="p-4 border text-center">Flexibilidade</th>
-                                <th class="p-4 border text-center">Custo Inicial</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-700">
-                            <tr class="bg-gray-50"><td class="p-4 border font-bold">Componentes</td><td class="p-4 border text-center">Médio</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Médio</td></tr>
-                            <tr><td class="p-4 border font-bold">Frameworks</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Média</td><td class="p-4 border text-center">Baixo</td></tr>
-                            <tr class="bg-gray-50"><td class="p-4 border font-bold">SPL</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Alto</td></tr>
-                            <tr><td class="p-4 border font-bold">COTS</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Muito Baixa</td><td class="p-4 border text-center">Variável</td></tr>
-                            <tr class="bg-gray-50"><td class="p-4 border font-bold">Geradores</td><td class="p-4 border text-center">Altíssima</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Baixo</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Visualização do Controlador (inicialmente oculta) -->
+        <div id="controller-view" class="w-full h-screen bg-gray-800 text-white flex flex-col justify-center items-center p-4">
+            <h2 class="text-4xl font-bold mb-4">Controlo Remoto</h2>
+            <p class="text-xl mb-8">Sessão: <span id="session-id-display" class="font-mono bg-gray-700 px-2 py-1 rounded"></span></p>
+            <div class="flex gap-8">
+                <button id="remote-prev-btn" class="w-32 h-32 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-4xl font-bold transition-transform transform active:scale-90">←</button>
+                <button id="remote-next-btn" class="w-32 h-32 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-4xl font-bold transition-transform transform active:scale-90">→</button>
             </div>
-            
-            <!-- Slide 20: Conclusões -->
-            <div id="slide-20" class="slide">
-                 <h2 class="text-5xl font-bold text-gray-800 mb-8">Conclusões</h2>
-                 <div class="space-y-8 text-4xl">
-                    <p class="p-4 bg-blue-50 rounded-lg">O reúso é uma estratégia <strong class="text-blue-600">fundamental</strong>, não um luxo.</p>
-                    <p class="p-4 bg-blue-50 rounded-lg">Exige uma <strong class="text-blue-600">mudança cultural</strong>: pensar em "construir para reutilizar".</p>
-                 </div>
-            </div>
-            
-            <!-- Slide 21: Perguntas? -->
-            <div id="slide-21" class="slide">
-                <h2 class="text-7xl font-bold text-gray-800">Perguntas?</h2>
-            </div>
-            
-            <!-- Slide 22: Referências -->
-            <div id="slide-22" class="slide items-start text-left">
-                <h2 class="text-5xl font-bold text-gray-800 mb-8">Bibliografia</h2>
-                <ul class="space-y-4 text-xl list-disc list-inside text-gray-600">
-                    <li>Czarnecki, K.; Eisenecker, U. W. <strong>Generative Programming: Methods, Tools, and Applications</strong>. Addison-Wesley, 2000.</li>
-                    <li>Pressman, Roger S. <strong>Engenharia de Software</strong>. 6ª ed., Bookman, 2006.</li>
-                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 9. ed. São Paulo: Pearson Addison Wesley, 2011.</li>
-                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 10. ed. São Paulo: Pearson, 2019.</li>
-                </ul>
-            </div>
-        </main>
-
-        <!--
-        <footer class="bg-gray-100 p-4 border-t border-gray-200">
-            <div class="w-full mx-auto flex justify-between items-center">
-                <button id="prev-btn" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    Anterior
-                </button>
-                <div id="slide-counter" class="text-gray-600 font-semibold"></div>
-                <button id="next-btn" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    Próximo
-                </button>
-            </div>
-        </footer>
-        -->
+             <p class="mt-8 text-gray-400">Pressione os botões para mudar os slides.</p>
+        </div>
 
     </div>
 
-    <script>
-        // --- ELEMENTOS DO DOM ---
-        const slides = document.querySelectorAll('.slide');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const slideCounter = document.getElementById('slide-counter');
-        
-        // --- ESTADO DA APRESENTAÇÃO ---
-        let currentSlideIndex = 0;
-        const totalSlides = slides.length;
+    <script type="module">
+        // Importar funções do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FUNÇÕES ---
-        function updateView() {
-            // Mostra o slide correto
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('active', index === currentSlideIndex);
-            });
+        // --- Configuração do App ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-            // Atualiza o contador de slides, se ele existir
-            if (slideCounter) {
-                slideCounter.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
-            }
+        // --- Inicializar Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            // Habilita/desabilita os botões de navegação, se eles existirem
-            if (prevBtn) {
-                prevBtn.disabled = currentSlideIndex === 0;
-            }
-            if (nextBtn) {
-                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
-            }
-        }
-
-        function nextSlide() {
-            if (currentSlideIndex < totalSlides - 1) {
-                currentSlideIndex++;
-                updateView();
-            }
-        }
-
-        function prevSlide() {
-            if (currentSlideIndex > 0) {
-                currentSlideIndex--;
-                updateView();
-            }
-        }
-        
-        // --- EVENT LISTENERS ---
-        // Navegação pelos botões, somente se eles existirem
-        if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-        }
-
-        // Navegação pelo teclado
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
+        // --- Autenticação ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                main(); // Inicia a lógica principal após a autenticação
+            } else {
+                 const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                 if(token){
+                     signInWithCustomToken(auth, token);
+                 } else {
+                     signInAnonymously(auth);
+                 }
             }
         });
+        
+        // --- Lógica Principal ---
+        async function main() {
+            const slides = document.querySelectorAll('.slide');
+            const urlHash = window.location.hash.substring(1);
+            const urlParams = new URLSearchParams(urlHash);
+            const sessionIdFromUrl = urlParams.get('session');
 
-        // --- INICIALIZAÇÃO ---
-        // Inicia a apresentação no primeiro slide
-        updateView();
+            const presenterContainer = document.getElementById('presenter-view');
+            const controllerContainer = document.getElementById('controller-view');
+            const setupOverlay = document.getElementById('setup-overlay');
+
+            let currentSlideIndex = 0;
+            const totalSlides = slides.length;
+            let docRef;
+
+            // --- MODO CONTROLADOR (quando acedido pelo telemóvel) ---
+            if (sessionIdFromUrl) {
+                presenterContainer.style.display = 'none';
+                setupOverlay.style.display = 'none';
+                controllerContainer.style.display = 'flex';
+                document.getElementById('session-id-display').textContent = sessionIdFromUrl;
+
+                docRef = doc(db, "artifacts", appId, "public", "data", "presentations", sessionIdFromUrl);
+
+                const remotePrevBtn = document.getElementById('remote-prev-btn');
+                const remoteNextBtn = document.getElementById('remote-next-btn');
+
+                remotePrevBtn.addEventListener('click', async () => {
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        let newSlide = docSnap.data().currentSlide - 1;
+                        if (newSlide >= 0) {
+                            await setDoc(docRef, { currentSlide: newSlide });
+                        }
+                    }
+                });
+
+                remoteNextBtn.addEventListener('click', async () => {
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        let newSlide = docSnap.data().currentSlide + 1;
+                         if (newSlide < totalSlides) {
+                            await setDoc(docRef, { currentSlide: newSlide });
+                        }
+                    }
+                });
+
+            // --- MODO APRESENTADOR (quando acedido pelo computador) ---
+            } else {
+                presenterContainer.style.display = 'block';
+                setupOverlay.style.display = 'flex'; // Mostra o ecrã de setup
+                
+                const sessionId = crypto.randomUUID().slice(0, 8);
+                docRef = doc(db, "artifacts", appId, "public", "data", "presentations", sessionId);
+
+                const publicUrl = window.location.href.split('#')[0];
+                const qrUrl = `${publicUrl}#session=${sessionId}`;
+                const qr = qrcode(0, 'L');
+                qr.addData(qrUrl);
+                qr.make();
+                
+                document.getElementById('qr-code-img').innerHTML = qr.createImgTag(5);
+                document.getElementById('session-id-qr').textContent = sessionId;
+
+                const startPresentationBtn = document.getElementById('start-presentation-btn');
+                startPresentationBtn.addEventListener('click', async () => {
+                    setupOverlay.style.display = 'none';
+                    await setDoc(docRef, { currentSlide: 0 });
+                    startPresenterMode();
+                });
+                
+                function startPresenterMode() {
+                    function updateView() {
+                        slides.forEach((slide, index) => {
+                            slide.classList.toggle('active', index === currentSlideIndex);
+                        });
+                    }
+                    
+                    updateView();
+
+                    onSnapshot(docRef, (doc) => {
+                        const data = doc.data();
+                        if (data && typeof data.currentSlide === 'number') {
+                            currentSlideIndex = data.currentSlide;
+                            updateView();
+                        }
+                    });
+
+                    document.addEventListener('keydown', async (e) => {
+                        let newSlide = currentSlideIndex;
+                        if (e.key === 'ArrowRight') newSlide++;
+                        else if (e.key === 'ArrowLeft') newSlide--;
+                        
+                        if(newSlide !== currentSlideIndex && newSlide >= 0 && newSlide < totalSlides){
+                           await setDoc(docRef, { currentSlide: newSlide });
+                        }
+                    });
+                }
+            }
+        }
     </script>
 </body>
 </html>
