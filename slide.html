@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação: Reúso de Software</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .slide {
+            display: none;
+        }
+        .slide.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        /* Efeito de transição suave para os slides */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Estilo para botões desabilitados */
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Container da Apresentação -->
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
+        
+        <!-- Área do Slide -->
+        <main id="slide-container" class="flex-grow p-8 md:p-12 lg:p-16 flex items-center justify-center aspect-video">
+
+            <!-- Slide 1: Título -->
+            <div id="slide-1" class="slide w-full h-full flex-col justify-center items-center text-center">
+                <div class="bg-blue-600 text-white py-2 px-4 rounded-full text-sm font-bold mb-4">Engenharia de Software I</div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800">Reúso de Software</h1>
+                <p class="text-xl md:text-2xl text-gray-600 mt-2">Estratégias e Impacto na Engenharia de Software</p>
+                <div class="mt-12 text-gray-500">
+                    <p>Autor: Matheus</p>
+                    <p class="mt-2">25 de Junho de 2025</p>
+                </div>
+            </div>
+
+            <!-- Slide 2: Roteiro -->
+            <div id="slide-2" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Roteiro da Apresentação</h2>
+                <ul class="space-y-4 text-xl text-gray-700 w-full">
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">1. Introdução: Conceito e Benefícios</li>
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">2. Abordagem 1: Componentização de Software</li>
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">3. Abordagem 2: Frameworks de Aplicações</li>
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">4. Abordagem 3: Linhas de Produção e COTS</li>
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">5. Abordagem 4: Geradores de Programas</li>
+                    <li class="p-3 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all hover:shadow-md hover:bg-white">6. Tabela Comparativa e Conclusão</li>
+                </ul>
+            </div>
+            
+            <!-- Slide 3: O que é Reúso? -->
+            <div id="slide-3" class="slide w-full h-full flex-col lg:flex-row items-center justify-center gap-8">
+                <div class="lg:w-2/3 text-left">
+                     <h2 class="text-3xl font-bold text-gray-800 mb-4">1. Introdução ao Reúso de Software</h2>
+                     <p class="text-xl text-gray-700 mb-4">É o processo de criar novos sistemas de software a partir de software existente, em vez de desenvolvê-lo completamente do zero. O reúso não se limita ao código, podendo incluir arquiteturas, especificações, documentação e casos de teste.</p>
+                     <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                        <p class="text-lg text-gray-800">O objetivo principal é acelerar o desenvolvimento, aumentar a confiabilidade e reduzir os custos, aproveitando soluções já validadas.</p>
+                     </div>
+                </div>
+                <div class="lg:w-1/3 flex items-center justify-center p-4">
+                    <img src="https://placehold.co/300x300/3B82F6/FFFFFF?text=Reutilizar" alt="Ilustração sobre reúso de software" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+
+            <!-- Slide 4: Componentização de Software -->
+            <div id="slide-4" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">2. Componentização de Software</h2>
+                <p class="text-lg text-gray-600 mb-6 font-mono text-sm">Referência: Pressman, R. S. (6ª ed.)</p>
+                <div class="w-full bg-gray-50 p-6 rounded-lg">
+                    <p class="mb-4"><strong>Conceito:</strong> Consiste em dividir o sistema em partes autônomas, independentes e com interfaces bem definidas, que podem ser desenvolvidas e implantadas de forma independente.</p>
+                    <p class="mb-4"><strong>Exemplo:</strong> Um componente de "autenticação de usuário" (login) que encapsula toda a lógica e UI, podendo ser integrado em múltiplos sistemas (web, desktop, mobile) de uma empresa.</p>
+                     <p class="mb-4"><strong>Processo de Criação:</strong> Envolve a qualificação (identificar candidatos a componente), adaptação (garantir que seja genérico) e composição (montar o sistema a partir dos componentes).</p>
+                    <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm">
+                        <div class="flex-1 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-sm"><strong>Vantagens:</strong> Facilita manutenção, aumenta o potencial de reúso e simplifica testes.</div>
+                        <div class="flex-1 p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-sm"><strong>Desvantagens:</strong> Exige um design de interfaces robusto; a integração pode ser complexa.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 5: Frameworks de Aplicações -->
+            <div id="slide-5" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">3. Frameworks de Aplicações</h2>
+                 <p class="text-lg text-gray-600 mb-6 font-mono text-sm">Referência: Sommerville, I. (10ª ed., 15.2)</p>
+                <div class="w-full bg-gray-50 p-6 rounded-lg">
+                    <p class="mb-4"><strong>Conceito:</strong> Estruturas reutilizáveis de código orientado a objetos, com classes genéricas e abstratas que fornecem uma arquitetura padrão para uma família de aplicações. O desenvolvedor estende as classes do framework para criar uma aplicação específica.</p>
+                    <p class="mb-4"><strong>Exemplo:</strong> Frameworks web como <strong>Django (Python)</strong> ou <strong>Spring (Java)</strong>, que definem o fluxo de controle (inversão de controle) e disponibilizam bibliotecas para acesso a dados, segurança, etc.</p>
+                     <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm">
+                        <div class="flex-1 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-sm"><strong>Vantagens:</strong> Reúso de arquitetura e design, menos retrabalho, código extensível.</div>
+                        <div class="flex-1 p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-sm"><strong>Desvantagens:</strong> Alta curva de aprendizado, específico para uma linguagem, uso limitado fora do domínio proposto.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Linhas de Produção de Software (SPL) -->
+            <div id="slide-6" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">4. Linhas de Produção de Software (SPL)</h2>
+                 <p class="text-lg text-gray-600 mb-6 font-mono text-sm">Referência: Sommerville, I. (10ª ed., 15.3)</p>
+                <div class="w-full bg-gray-50 p-6 rounded-lg">
+                    <p class="mb-4"><strong>Conceito:</strong> Uma abordagem para engenharia de software onde um conjunto de "ativos de núcleo" (core assets) é usado como base para construir uma família de produtos de software. Os produtos compartilham uma arquitetura comum, mas possuem variações específicas.</p>
+                    <p class="mb-4"><strong>Exemplo:</strong> Uma plataforma de e-commerce que gera sites de venda com diferentes layouts, moedas e regras de frete, mas todos derivados do mesmo núcleo técnico.</p>
+                    <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm">
+                        <div class="flex-1 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-sm"><strong>Vantagens:</strong> Desenvolvimento mais rápido de novos produtos, fácil para a equipe, testes reutilizáveis.</div>
+                        <div class="flex-1 p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-sm"><strong>Desvantagens:</strong> Exige alto investimento inicial, erros no núcleo afetam todos os produtos, difícil de evoluir.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Reúso de Produtos COTS -->
+            <div id="slide-7" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">4. Reúso de Produtos COTS</h2>
+                <p class="text-lg text-gray-600 mb-6 font-mono text-sm">Referência: Sommerville, I. (9ª ed., 16.4)</p>
+                <div class="w-full bg-gray-50 p-6 rounded-lg">
+                     <p class="mb-4"><strong>Conceito:</strong> "Commercial Off-The-Shelf" são sistemas de software prontos que podem ser comprados de um fornecedor externo e integrados em um sistema maior. Eles são configuráveis, mas geralmente não são modificáveis em seu código-fonte.</p>
+                     <p class="mb-4"><strong>Exemplo:</strong> Utilizar um ERP (Enterprise Resource Planning) como o <strong>SAP</strong> para gestão empresarial, ou um sistema de gestão hospitalar pronto em vez de construir um do zero.</p>
+                    <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm">
+                        <div class="flex-1 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-sm"><strong>Vantagens:</strong> Implantação rápida, software confiável e já testado, menor custo inicial.</div>
+                        <div class="flex-1 p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-sm"><strong>Desvantagens:</strong> Difícil adaptação, dependência de fornecedor, limitações nos processos internos da empresa.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Geradores de Programas -->
+            <div id="slide-8" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">5. Geradores de Programas</h2>
+                <p class="text-lg text-gray-600 mb-6 font-mono text-sm">Referência: Czarnecki, K.; Eisenecker, U. W.</p>
+                <div class="w-full bg-gray-50 p-6 rounded-lg">
+                    <p class="mb-4"><strong>Conceito:</strong> Ferramentas que criam software automaticamente a partir de descrições de alto nível, como modelos, templates ou parâmetros. É uma abordagem central da <strong>Engenharia de Software Baseada em Modelos</strong>, onde o foco está no "o quê" em vez do "como".</p>
+                    <p class="mb-4"><strong>Exemplo:</strong> Geradores de CRUD (Create, Read, Update, Delete) que criam o código para operações de banco de dados a partir da definição de um modelo de dados.</p>
+                     <div class="flex flex-col md:flex-row gap-4 mt-4 text-sm">
+                        <div class="flex-1 p-4 bg-white border-l-4 border-green-500 rounded-lg shadow-sm"><strong>Vantagens:</strong> Altíssima produtividade para tarefas repetitivas, redução de erros humanos.</div>
+                        <div class="flex-1 p-4 bg-white border-l-4 border-red-500 rounded-lg shadow-sm"><strong>Desvantagens:</strong> Código gerado pode ser genérico, forte dependência da ferramenta, pouca flexibilidade fora do padrão.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Slide 9: Tabela Comparativa -->
+            <div id="slide-9" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">6. Tabela Comparativa</h2>
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-600 text-white">
+                                <th class="p-3 border">Abordagem</th>
+                                <th class="p-3 border text-center">Custo Inicial</th>
+                                <th class="p-3 border text-center">Velocidade</th>
+                                <th class="p-3 border text-center">Flexibilidade</th>
+                                <th class="p-3 border text-center">Risco</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            <tr class="bg-gray-50 hover:bg-gray-100">
+                                <td class="p-3 border font-bold">Componentes</td>
+                                <td class="p-3 border text-center">Médio</td>
+                                <td class="p-3 border text-center">Médio</td>
+                                <td class="p-3 border text-center">Alta</td>
+                                <td class="p-3 border text-center">Médio</td>
+                            </tr>
+                            <tr class="hover:bg-gray-100">
+                                <td class="p-3 border font-bold">Frameworks</td>
+                                <td class="p-3 border text-center">Baixo</td>
+                                <td class="p-3 border text-center">Alta</td>
+                                <td class="p-3 border text-center">Média</td>
+                                <td class="p-3 border text-center">Baixo</td>
+                            </tr>
+                            <tr class="bg-gray-50 hover:bg-gray-100">
+                                <td class="p-3 border font-bold">SPL</td>
+                                <td class="p-3 border text-center">Alto</td>
+                                <td class="p-3 border text-center">Muito Alta</td>
+                                <td class="p-3 border text-center">Baixa</td>
+                                <td class="p-3 border text-center">Alto</td>
+                            </tr>
+                             <tr class="hover:bg-gray-100">
+                                <td class="p-3 border font-bold">COTS</td>
+                                <td class="p-3 border text-center">Variável</td>
+                                <td class="p-3 border text-center">Muito Alta</td>
+                                <td class="p-3 border text-center">Muito Baixa</td>
+                                <td class="p-3 border text-center">Médio</td>
+                            </tr>
+                            <tr class="bg-gray-50 hover:bg-gray-100">
+                                <td class="p-3 border font-bold">Geradores</td>
+                                <td class="p-3 border text-center">Baixo</td>
+                                <td class="p-3 border text-center">Altíssima</td>
+                                <td class="p-3 border text-center">Baixa</td>
+                                <td class="p-3 border text-center">Baixo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                 <p class="mt-4 text-center w-full text-gray-600">Não existe "bala de prata": a escolha depende do contexto do projeto.</p>
+            </div>
+            
+            <!-- Slide 10: Conclusões -->
+            <div id="slide-10" class="slide w-full h-full flex-col justify-center items-center text-center">
+                 <h2 class="text-3xl font-bold text-gray-800 mb-8">Conclusões</h2>
+                 <div class="space-y-6 text-xl">
+                    <p class="p-4 bg-blue-50 rounded-lg shadow-sm">O reúso é uma estratégia <strong class="text-blue-600">fundamental</strong> para a engenharia de software moderna, não um luxo.</p>
+                    <p class="p-4 bg-blue-50 rounded-lg shadow-sm">Exige uma <strong class="text-blue-600">mudança cultural e de processo</strong>: pensar em "construir para reutilizar" e não apenas para o projeto atual.</p>
+                    <p class="p-4 bg-blue-50 rounded-lg shadow-sm">A escolha da abordagem correta é <strong class="text-blue-600">contextual</strong> e impacta diretamente o sucesso, custo e flexibilidade do projeto.</p>
+                 </div>
+            </div>
+            
+            <!-- Slide 11: Perguntas? -->
+            <div id="slide-11" class="slide w-full h-full flex-col justify-center items-center">
+                <h2 class="text-5xl md:text-6xl font-bold text-gray-800">Perguntas?</h2>
+                <p class="text-gray-500 mt-4">Estamos à disposição para responder.</p>
+            </div>
+            
+            <!-- Slide 12: Referências -->
+            <div id="slide-12" class="slide w-full h-full flex-col justify-center items-start">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Bibliografia</h2>
+                <ul class="space-y-4 text-sm md:text-base list-disc list-inside text-gray-600">
+                    <li>Czarnecki, K.; Eisenecker, U. W. <strong>Generative Programming: Methods, Tools, and Applications</strong>. Addison-Wesley, 2000. ISBN: 978-0201309775.</li>
+                    <li>Pressman, Roger S. <strong>Engenharia de Software</strong>. 6ª ed., Bookman, 2006.</li>
+                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 9. ed. São Paulo: Pearson Addison Wesley, 2011.</li>
+                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 10. ed. São Paulo: Pearson, 2019.</li>
+                </ul>
+            </div>
+        </main>
+        
+        <!-- Rodapé de Navegação -->
+        <footer class="bg-gray-100 p-4 border-t border-gray-200">
+            <div class="w-full max-w-4xl mx-auto flex justify-between items-center">
+                <button id="prev-btn" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Anterior
+                </button>
+                <div id="slide-counter" class="text-gray-600 font-semibold"></div>
+                <button id="next-btn" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Próximo
+                </button>
+            </div>
+        </footer>
+        
+    </div>
+
+    <script>
+        // --- ELEMENTOS DO DOM ---
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideCounter = document.getElementById('slide-counter');
+
+        // --- ESTADO DA APRESENTAÇÃO ---
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        // --- FUNÇÕES ---
+        function updateView() {
+            // Mostra o slide correto
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlideIndex);
+            });
+
+            // Atualiza o contador de slides
+            if (slideCounter) {
+                slideCounter.textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+            }
+
+            // Habilita/desabilita os botões de navegação
+            if (prevBtn) {
+                prevBtn.disabled = currentSlideIndex === 0;
+            }
+            if (nextBtn) {
+                nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                updateView();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                updateView();
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        // Navegação pelos botões
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+
+        // Navegação pelo teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // --- INICIALIZAÇÃO ---
+        // Inicia a apresentação no primeiro slide
+        updateView();
+    </script>
+</body>
+</html>
