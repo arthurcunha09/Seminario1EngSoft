@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação: Reúso de Software</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Impede barras de rolagem */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            display: grid; /* Usado para centralizar perfeitamente */
+            place-items: center; /* Centraliza o conteúdo na horizontal e vertical */
+        }
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 4rem;
+        }
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Estilo para o container da apresentação */
+        .presentation-container {
+            max-width: 80vw;
+            max-height: 80vh;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 16 / 9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="presentation-container bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
+        
+        <main id="slide-container" class="w-full h-full">
+
+            <div id="slide-1" class="slide">
+                <div class="bg-blue-600 text-white py-2 px-4 rounded-full text-lg font-bold mb-6">Engenharia de Software I</div>
+                <h1 class="text-6xl md:text-7xl font-black text-gray-800">Reúso de Software</h1>
+                <p class="text-3xl md:text-4xl text-gray-600 mt-4">Estratégias e Impacto</p>
+                <div class="mt-16 text-2xl text-gray-500">
+                    <p>Autores: Arthur, João, Matheus, Pedro, Ryan</p>
+                </div>
+            </div>
+
+            <div id="slide-2" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full">Roteiro da Apresentação</h2>
+                <ul class="w-full space-y-5 text-3xl">
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">1</span><p>Introdução</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">2</span><p>Componetização (Ryan)</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">3</span><p>Frameworks (Pedro)</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">4</span><p>Linhas de Produção (Arthur)</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">5</span><p>Produtos COTS (Matheus)</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">6</span><p>Geradores de Código (João)</p></li>
+                    <li class="flex items-center gap-4"><span class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 font-bold rounded-full text-2xl flex-shrink-0">7</span><p>Conclusão</p></li>
+                </ul>
+            </div>
+            
+            <div id="slide-3" class="slide">
+                 <h2 class="text-5xl font-bold text-gray-800 mb-6">O que é Reúso de Software?</h2>
+                 <p class="text-4xl text-gray-700 leading-tight">É o processo de criar software a partir de partes já existentes, em vez de começar do zero.</p>
+                 <p class="mt-8 text-4xl font-bold text-blue-600 p-6 bg-blue-50 rounded-lg">"Não reinventar a roda."</p>
+            </div>
+
+            <div id="slide-4" class="slide">
+                <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2 text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6">Componentização</h2>
+                        <p class="text-3xl text-gray-600 mb-4">Separar o sistema em partes reutilizáveis e independentes.</p>
+                        <p class="text-2xl text-gray-600 mb-2">É possível pensar em peças de LEGO que se encaixam em diversas outras.</p>
+                        <p class="text-2xl text-gray-600 mb-2">De forma mais técnica, um componente de login usado em várias páginas diferentes.</p>
+                    </div>
+                    <div class="w-full md:w-1/2 flex justify-center items-center">
+                        <svg class="w-48 h-48" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g><rect x="20" y="80" width="80" height="40" rx="5" fill="#f56565"/><circle cx="40" cy="72" r="8" fill="#f56565"/><circle cx="80" cy="72" r="8" fill="#f56565"/><rect x="100" y="120" width="80" height="40" rx="5" fill="#4299e1"/><circle cx="120" cy="112" r="8" fill="#4299e1"/><circle cx="160" cy="112" r="8" fill="#4299e1"/><rect x="60" y="120" width="40" height="40" rx="5" fill="#48bb78"/><circle cx="80" cy="112" r="8" fill="#48bb78"/></g></svg>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-5" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Componentização</h2>
+                 <div class="w-full flex gap-8 text-3xl">
+                    <div class="w-1/2">
+                        <h3 class="font-bold text-green-600 mb-4">Vantagens</h3>
+                        <ul class="space-y-4 list-disc list-inside">
+                            <li>Organização</li>
+                            <li>Reuso</li>
+                            <li>Manutenção facilitada</li>
+                        </ul>
+                    </div>
+                    <div class="w-1/2">
+                        <h3 class="font-bold text-red-600 mb-4">Desvantagens</h3>
+                         <ul class="space-y-4 list-disc list-inside">
+                            <li>Complexidade inicial</li>
+                            <li>Sobrecarga de estrutura</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-6" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Ciclo de Vida de um Componente</h2>
+                 <div class="w-full flex justify-around text-2xl text-center">
+                    <div class="w-1/4">
+                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
+                        <h3 class="font-bold mb-2">1. Qualificar</h3>
+                        <p class="text-gray-600">Identificar candidatos a componentes reutilizáveis.</p>
+                    </div>
+                     <div class="w-1/4">
+                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m12.728 12.728L15.95 15.95m-1.414-1.414l-1.414-1.414"></path><circle cx="12" cy="12" r="3"></circle></svg></div>
+                        <h3 class="font-bold mb-2">2. Generalizar</h3>
+                        <p class="text-gray-600">Adaptar o código para ser independente do contexto.</p>
+                    </div>
+                     <div class="w-1/4">
+                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4"><svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M3 10v6a2 2 0 002 2h6M3 10V4a2 2 0 012-2h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V10M3 10h6.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V20"></path></svg></div>
+                        <h3 class="font-bold mb-2">3. Compor</h3>
+                        <p class="text-gray-600">Montar a aplicação final usando os componentes.</p>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-7" class="slide">
+                <div class="w-full h-full flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-full md:w-1/2 flex justify-center items-center">
+                        <svg class="w-48 h-48 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="w-full md:w-1/2 text-left">
+                        <h2 class="text-5xl font-bold text-gray-800 mb-6">Frameworks</h2>
+                        <p class="text-3xl text-gray-700 leading-tight">É uma estrutura de suporte reutilizável que oferece ferramentas, bibliotecas e regras para facilitar o desenvolvimento de software.</p>
+                    </div>
+                </div>
+            </div>
+             <div id="slide-8" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Principais Vantagens</h2>
+                 <div class="w-full grid grid-cols-2 gap-x-12 gap-y-8 text-3xl">
+                     <div class="flex items-center gap-4">
+                        <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <p>Agilidade e Produtividade</p>
+                    </div>
+                     <div class="flex items-center gap-4">
+                         <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                        <p>Organização do Projeto</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.471a9 9 0 11-12.728 0A9 9 0 0118.382 7.529z"></path></svg>
+                        <p>Segurança</p>
+                    </div>
+                     <div class="flex items-center gap-4">
+                         <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <p>Comunidade Ativa</p>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-9" class="slide items-start text-left">
+                 <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Quem está no Controle?</h2>
+                 <div class="w-full flex justify-around text-2xl text-center">
+                    <div class="w-2/5">
+                        <h3 class="font-bold text-gray-700 text-3xl mb-4">Desenvolvimento Tradicional</h3>
+                        <div class="p-4 border-2 border-gray-300 rounded-lg">
+                            <div class="bg-indigo-500 text-white p-3 rounded mb-4">SEU CÓDIGO</div>
+                            <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            <div class="bg-gray-300 text-gray-700 p-3 rounded mt-4">BIBLIOTECA</div>
+                        </div>
+                    </div>
+                    <div class="w-2/5">
+                        <h3 class="font-bold text-blue-700 text-3xl mb-4">Usando um Framework</h3>
+                         <div class="p-4 border-2 border-blue-500 rounded-lg">
+                            <div class="bg-blue-500 text-white p-3 rounded mb-4">FRAMEWORK</div>
+                            <svg class="w-8 h-8 mx-auto text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            <div class="bg-indigo-300 text-gray-700 p-3 rounded mt-4">SEU CÓDIGO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-10" class="slide">
+                 <h2 class="text-5xl font-bold text-gray-800 mb-6">Uma Abordagem Industrial</h2>
+                 <p class="text-4xl text-gray-700 leading-tight">Vamos falar sobre as <strong class="text-blue-600">Linhas de Produção de Software</strong>.</p>
+                 <p class="text-3xl text-gray-500 mt-4">Do inglês: <em>Software Product Lines</em> (SPL).</p>
+            </div>
+            <div id="slide-11" class="slide">
+                 <h2 class="text-5xl font-bold text-gray-800 mb-6">A Analogia: Indústria Automobilística</h2>
+                 <p class="text-4xl text-gray-700 leading-tight">Como a Volkswagen consegue produzir carros tão diferentes como Golf, T-Cross e Audi A3 de forma tão eficiente?</p>
+            </div>
+            <div id="slide-12" class="slide">
+                <div class="w-full h-full flex flex-col justify-center items-center">
+                    <h2 class="text-5xl font-bold text-gray-800 mb-8">A Resposta: A Plataforma</h2>
+                    <div class="w-1/2 bg-gray-200 rounded-lg p-4 border-2 border-dashed border-gray-400 text-center">
+                        <p class="text-2xl font-bold text-gray-600">Plataforma MQB (Núcleo Comum)</p>
+                        <p class="text-xl text-gray-500">(Chassi, Motor, Elétrica)</p>
+                    </div>
+                    <div class="flex w-full justify-around mt-4">
+                        <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                    </div>
+                    <div class="flex w-full justify-around mt-4">
+                        <div class="w-1/3 bg-red-500 rounded-lg p-4 shadow-lg text-white">
+                            <p class="text-3xl font-bold">Hatch</p>
+                            <p class="text-lg">Variação 1</p>
+                        </div>
+                        <div class="w-1/3 bg-gray-700 rounded-lg p-4 shadow-lg text-white">
+                            <p class="text-3xl font-bold">SUV</p>
+                            <p class="text-lg">Variação 2</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-13" class="slide">
+                <h2 class="text-5xl font-bold text-gray-800 mb-6">A "Fábrica" de Software</h2>
+                <p class="text-4xl text-gray-700 leading-tight">Uma SPL cria uma <strong class="text-blue-600">plataforma base</strong> (ativos de núcleo) e a partir dela, gera uma <strong class="text-blue-600">família de produtos</strong> com variações específicas.</p>
+            </div>
+            <div id="slide-14" class="slide items-start text-left">
+                 <h2 class="text-5xl font-bold text-green-600 mb-10">Por que usar uma SPL?</h2>
+                 <ul class="space-y-6 text-4xl list-decimal list-inside">
+                    <li><strong>Velocidade:</strong> Lançar novos produtos se torna muito mais rápido.</li>
+                    <li><strong>Confiabilidade:</strong> O núcleo é amplamente testado e validado.</li>
+                    <li><strong>Padronização:</strong> Garante consistência e facilita o trabalho da equipe.</li>
+                </ul>
+            </div>
+            <div id="slide-15" class="slide items-start text-left">
+                 <h2 class="text-5xl font-bold text-red-600 mb-10">O Preço a Pagar</h2>
+                 <ul class="space-y-6 text-4xl list-decimal list-inside">
+                    <li><strong>Planejamento:</strong> Exige um altíssimo investimento e planejamento inicial.</li>
+                    <li><strong>Risco Centralizado:</strong> Um erro no núcleo afeta TODOS os produtos.</li>
+                    <li><strong>Evolução Lenta:</strong> Mudar a plataforma base é um processo complexo.</li>
+                </ul>
+            </div>
+            <div id="slide-16" class="slide">
+                <h2 class="text-5xl font-bold text-gray-800 mb-6">SPL no Mundo Real</h2>
+                <p class="text-3xl text-gray-600 mb-6">Os sites de imobiliária são um ótimo exemplo prático.</p>
+                <div class="w-full h-2/3 grid grid-cols-3 gap-4">
+                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/senna.png" alt="Screenshot do site Senna Imóveis" class="w-full h-full object-cover"></div>
+                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/martins.png" alt="Screenshot do site Martins Imóveis" class="w-full h-full object-cover"></div>
+                    <div class="w-full h-full rounded-lg shadow-lg overflow-hidden"><img src="imagens/delci.png" alt="Screenshot do site Delci Couto Imobiliária" class="w-full h-full object-cover"></div>
+                </div>
+            </div>
+            <div id="slide-17" class="slide items-center">
+                <h2 class="text-5xl font-bold text-gray-800 mb-12 text-center">Produtos COTS</h2>
+                <div class="w-full max-w-4xl space-y-6">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg shadow-md flex items-center">
+                        <svg class="w-10 h-10 text-blue-600 mr-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <p class="text-3xl text-gray-700 leading-snug">
+                            Produtos COTS são 
+                            <span class="font-semibold text-blue-800">soluções de software ou hardware prontas para uso</span>, 
+                            compradas no mercado.
+                        </p>
+                    </div>
+                    <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg shadow-md flex items-center">
+                        <svg class="w-10 h-10 text-green-600 mr-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 14c-1.11 0-2.08-.402-2.599-1M12 14v1m0 1v1m0-2.01M12 18v-1m0-1v-.01"></path></svg>
+                        <p class="text-3xl text-gray-700 leading-snug">
+                            Oferecem uma alternativa 
+                            <span class="font-semibold text-green-800">eficiente e de custo-benefício</span> 
+                            para construir algo do zero.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide-18(Exemplo Cots)" class="slide items-start">
+                <h2 class="text-5xl font-bold text-gray-800 mb-12 w-full text-center">COTS no nosso dia a dia</h2>
+            
+                <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex items-center border-l-4 border-blue-500">
+                        <svg class="w-12 h-12 text-blue-600 mr-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">Suítes de Produtividade</h3>
+                            <p class="text-xl text-gray-600">Microsoft 365, Google Workspace</p>
+                        </div>
+                    </div>
+            
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex items-center border-l-4 border-purple-500">
+                         <svg class="w-12 h-12 text-purple-600 mr-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h3m-3 4h3m-3 0h3"></path></svg>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">Sistemas de Gestão (ERP/CRM)</h3>
+                            <p class="text-xl text-gray-600">SAP, Salesforce, Oracle</p>
+                        </div>
+                    </div>
+            
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex items-center border-l-4 border-yellow-500">
+                        <svg class="w-12 h-12 text-yellow-600 mr-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">Bancos de Dados</h3>
+                            <p class="text-xl text-gray-600">MySQL, PostgreSQL, SQL Server</p>
+                        </div>
+                    </div>
+            
+                    <div class="bg-white p-6 rounded-lg shadow-lg flex items-center border-l-4 border-green-500">
+                        <svg class="w-12 h-12 text-green-600 mr-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">Ferramentas de Comunicação</h3>
+                            <p class="text-xl text-gray-600">Slack, Microsoft Teams, Zoom</p>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+
+
+            
+            <div id="slide-19(Cots Classes)" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">COTS: Configurar vs. Integrar</h2>
+                
+                <div class="w-full flex justify-center gap-8 text-2xl text-center">
+            
+                    <div class="w-2/5 p-6 border-2 border-teal-500 rounded-lg shadow-md">
+                        <svg class="w-16 h-16 mx-auto text-teal-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <h3 class="font-bold text-3xl mb-4">COTS Configurável</h3>
+                        
+                        <div class="text-left text-xl space-y-3">
+                            <p>
+                                <span class="font-semibold text-teal-800">Foco:</span> Ajustar o produto para se adequar aos processos de negócio.
+                            </p>
+                            <p>
+                                <span class="font-semibold text-teal-800">Como:</span> Através de painéis administrativos, menus e opções pré-definidas, sem alterar o código.
+                            </p>
+                            <p>
+                                <span class="font-semibold text-teal-800">Exemplo:</span> Habilitar ou desabilitar módulos em um sistema ERP.
+                            </p>
+                        </div>
+                    </div>
+            
+                    <div class="w-2/5 p-6 border-2 border-indigo-500 rounded-lg shadow-md">
+                        <svg class="w-16 h-16 mx-auto text-indigo-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"></path></svg>
+                         <h3 class="font-bold text-3xl mb-4">COTS Integrado</h3>
+            
+                        <div class="text-left text-xl space-y-3">
+                             <p>
+                                <span class="font-semibold text-indigo-800">Foco:</span> Conectar o COTS com outros sistemas para que funcionem juntos.
+                            </p>
+                            <p>
+                                <span class="font-semibold text-indigo-800">Como:</span> Usando APIs, webhooks e conectores para permitir a troca de dados e automação.
+                            </p>
+                            <p>
+                                <span class="font-semibold text-indigo-800">Exemplo:</span> Ligar um e-commerce (COTS) a um sistema de pagamento (outro COTS).
+                            </p>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+
+
+            
+            <div id="slide-20(Criar Ou Configurar)" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">O Dilema: Construir vs. Comprar</h2>
+                <div class="w-full flex justify-center gap-8 text-2xl text-center">
+                    <div class="w-2/5 p-4 border-2 border-gray-300 rounded-lg">
+                        <svg class="w-16 h-16 mx-auto text-gray-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <h3 class="font-bold text-3xl mb-4">Construir</h3>
+                        <div class="text-left text-xl space-y-2">
+                            <p class="text-green-600 font-semibold"><span class="font-bold text-2xl">+</span> Controle total e customização.</p>
+                            <p class="text-green-600 font-semibold"><span class="font-bold text-2xl">+</span> Vantagem competitiva única.</p>
+                            <p class="text-red-600 font-semibold"><span class="font-bold text-2xl">-</span> Alto custo e longo prazo.</p>
+                            <p class="text-red-600 font-semibold"><span class="font-bold text-2xl">-</span> Exige equipe e maior risco.</p>
+                        </div>
+                    </div>
+                    <div class="w-2/5 p-4 border-2 border-blue-500 rounded-lg">
+                        <svg class="w-16 h-16 mx-auto text-blue-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                        <h3 class="font-bold text-3xl mb-4">Comprar (COTS)</h3>
+                        <div class="text-left text-xl space-y-2">
+                             <p class="text-green-600 font-semibold"><span class="font-bold text-2xl">+</span> Implementação rápida e custo menor.</p>
+                             <p class="text-green-600 font-semibold"><span class="font-bold text-2xl">+</span> Suporte e manutenção garantidos.</p>
+                             <p class="text-red-600 font-semibold"><span class="font-bold text-2xl">-</span> Menos flexível, exige adaptação.</p>
+                             <p class="text-red-600 font-semibold"><span class="font-bold text-2xl">-</span> Dependência do fornecedor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="slide-19" class="slide">
+                <h2 class="text-5xl font-bold text-gray-800 mb-6">Geradores de Programas</h2>
+                <p class="text-3xl text-green-800 bg-green-100 p-3 rounded-lg mb-4"><strong>Um Gerador</strong> acelera o desenvolvimento e padroniza a qualidade do código.</p>
+                <p class="text-4xl text-gray-700 leading-tight">Pense em uma máquina de café: você não precisa saber moer os grãos ou aquecer a água. Você apenas escolhe o que quer (um expresso) e a máquina o gera para você.</p>
+            </div>
+            <div id="slide-20" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-10 w-full text-center">Subindo na Escada da Abstração</h2>
+                <div class="w-full flex justify-center items-center text-2xl text-center">
+                    <div class="w-3/4 space-y-2">
+                        <div class="p-4 bg-blue-500 text-white rounded-lg shadow-lg">
+                            <h3 class="text-3xl font-bold">GERADOR</h3>
+                            <p class="text-gray-200">A ferramenta que transforma a especificação em código funcional. É o "motor" da automação.</p>
+                        </div>
+                        <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                         <div class="p-4 bg-indigo-400 text-white rounded-lg shadow-lg">
+                            <h3 class="text-3xl font-bold">MODELO (UML, DSL)</h3>
+                            <p class="text-gray-200">Uma descrição de alto nível do que o software deve fazer, usando linguagens visuais ou específicas de domínio.</p>
+                        </div>
+                         <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                          <div class="p-4 bg-gray-300 text-gray-700 rounded-lg shadow-lg">
+                            <h3 class="text-3xl font-bold">CÓDIGO (JAVA, PYTHON)</h3>
+                            <p class="text-gray-600">O produto final: código-fonte pronto para ser compilado e executado, totalmente gerado a partir do modelo.</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-2xl mt-4 w-full text-center text-gray-500">Menos preocupação com o "como", mais foco no "o quê".</p>
+            </div>
+            <div id="slide-21" class="slide items-start w-full">
+                <h2 class="text-5xl font-bold text-gray-800 mb-6 w-full text-center">Tabela Comparativa</h2>
+                <div class="w-full overflow-x-auto text-2xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-blue-600 text-white">
+                                <th class="p-4 border">Abordagem</th>
+                                <th class="p-4 border text-center">Velocidade</th>
+                                <th class="p-4 border text-center">Flexibilidade</th>
+                                <th class="p-4 border text-center">Custo Inicial</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
+                            <tr class="bg-gray-50"><td class="p-4 border font-bold">Componentes</td><td class="p-4 border text-center">Médio</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Médio</td></tr>
+                            <tr><td class="p-4 border font-bold">Frameworks</td><td class="p-4 border text-center">Alta</td><td class="p-4 border text-center">Média</td><td class="p-4 border text-center">Baixo</td></tr>
+                            <tr class="bg-gray-50"><td class="p-4 border font-bold">SPL</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Alto</td></tr>
+                            <tr><td class="p-4 border font-bold">COTS</td><td class="p-4 border text-center">Muito Alta</td><td class="p-4 border text-center">Muito Baixa</td><td class="p-4 border text-center">Variável</td></tr>
+                            <tr class="bg-gray-50"><td class="p-4 border font-bold">Geradores</td><td class="p-4 border text-center">Altíssima</td><td class="p-4 border text-center">Baixa</td><td class="p-4 border text-center">Baixo</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="slide-22" class="slide">
+                 <h2 class="text-5xl font-bold text-gray-800 mb-8">Conclusões</h2>
+                 <div class="space-y-8 text-4xl">
+                    <p class="p-4 bg-blue-50 rounded-lg">O reúso é uma estratégia <strong class="text-blue-600">fundamental</strong>, não um luxo.</p>
+                    <p class="p-4 bg-blue-50 rounded-lg">Exige uma <strong class="text-blue-600">mudança cultural</strong>: pensar em "construir para reutilizar".</p>
+                </div>
+            </div>
+            
+            <div id="slide-23" class="slide">
+                <h2 class="text-7xl font-bold text-gray-800">Perguntas?</h2>
+            </div>
+            
+            <div id="slide-24" class="slide items-start text-left">
+                <h2 class="text-5xl font-bold text-gray-800 mb-8">Bibliografia</h2>
+                <ul class="space-y-4 text-xl list-disc list-inside text-gray-600">
+                    <li>Czarnecki, K.; Eisenecker, U. W. <strong>Generative Programming: Methods, Tools, and Applications</strong>. Addison-Wesley, 2000.</li>
+                    <li>Pressman, Roger S. <strong>Engenharia de Software</strong>. 6ª ed., Bookman, 2006.</li>
+                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 9. ed. São Paulo: Pearson Addison Wesley, 2011.</li>
+                    <li>Sommerville, Ian. <strong>Engenharia de software</strong>. 10. ed. São Paulo: Pearson, 2019.</li>
+                </ul>
+            </div>
+        </main>
+        
+    </div>
+
+    <div class="fixed bottom-4 left-4 right-4 flex justify-between z-50">
+        <button onclick="prevSlide()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+            Anterior
+        </button>
+        <button onclick="nextSlide()" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+            Próximo
+        </button>
+    </div>
+    <script>
+        // --- ELEMENTOS DO DOM ---
+        const slides = document.querySelectorAll('.slide');
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        // --- FUNÇÕES ---
+        function updateView() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlideIndex);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                updateView();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                updateView();
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+        
+        // Removi os listeners de clique no documento para que apenas os botões controlem
+        // document.addEventListener('click', (e) => {
+        //     nextSlide();
+        // });
+        
+        document.addEventListener('contextmenu', (e) => {
+            // Previne o menu de contexto do clique direito
+            e.preventDefault();
+        });
+
+        // --- INICIALIZAÇÃO ---
+        updateView();
+    </script>
+</body>
+</html>
